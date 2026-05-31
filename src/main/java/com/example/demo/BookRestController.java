@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
@@ -18,21 +19,35 @@ public class BookRestController {
 
 
     @GetMapping("/book")
-    public String get() {
-        BookEntity newBook = BookEntity.builder()
-                                       .title("DungeonCrawlerCarl")
-                                       .pages(510)
-                                       .build();
+    public String get(@RequestParam String name, @RequestParam Integer pages) {
+    
+        log.info("Received request to create book with name: {} and pages: {}", name, pages);
 
-        log.info("New book created: {}", newBook);
+        BookEntity existingBook = bookRepository.findByNameAndPages(name, pages);
+
+        if(existingBook == null) {
+
+        BookEntity newBook = BookEntity.builder()
+                                       .name(name)
+                                       .pages(pages)
+                                       .build();
 
         bookRepository.save(newBook);
         
-        return "Hello World";
+        log.info("Book saved successfully: {}", newBook);
+        return "Book saved successfully";
+
+        } else {
+            log.info("Book already exists: {}", existingBook);
+            return "Book already exists";
+        }
+
+
+
+
+
+
     }
-
-
-
 
 
 
